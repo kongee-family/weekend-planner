@@ -17,7 +17,16 @@
 | `--no-slack` | 슬랙 전송 생략 |
 | `--no-open` | 브라우저 자동 열기 생략 |
 
-## Phase 2 (+반나절) — 월간화·자동화
+## ✅ 추가 완료 (2026-10-17): 매주 자동 실행
+
+- GitHub Actions(`.github/workflows/weekly.yml`)로 **매주 목요일 21:00(한국시간)**에 자동 실행돼요. Mac이 꺼져 있어도 돌아가요.
+- 대시보드는 https://kongee-family.github.io/weekend-planner/ 에 게시돼요(공개 주소). 슬랙 메시지의 "📊 상세"가 이 주소예요.
+- 실패하면 슬랙으로 "생성 실패 + 사유 링크" 알림이 가요(`src/notify_failure.py`).
+- 수동 실행: GitHub → Actions → "주말 확정안 (매주 목 21시)" → Run workflow.
+- 비밀값(SLACK_BOT_TOKEN, SLACK_CHANNEL)은 GitHub 저장소의 Settings → Secrets에 들어 있어요.
+- 주의: 공개 저장소에 60일 동안 변경이 없으면 GitHub가 예약 실행을 멈춰요. 이메일이 오면 Actions 탭에서 다시 켜 주세요.
+
+## Phase 2 (+반나절) — 월간화·자동화 (④ 중 '매주 목요일 확정'과 실패 알림은 완료)
 
 1. **월초 4주 × 토/일 × 실내/실외 생성**: `build_plan()`을 주 단위로 반복해 `output/month.json`에 저장해요. 날씨는 월초에 계절 평년값만 쓰고, 확정은 목요일에 해요.
 2. **월간 캘린더 뷰 추가**: 대시보드에 주별 날씨 배지, 선택안, 장소명을 보여 주는 캘린더를 넣어요.
