@@ -10,6 +10,8 @@
 {%- set RAIN = ["....GGG.....", "...GGGGG.GG.", ".GGGGGGGGGGG", "GGGGGGGGGGGG", ".GGGGGGGGGG.", "............", "..B...B...B.", ".B...B...B..", "............", "...B...B...B", "..B...B...B."] -%}
 {%- set CAR = ["....PPPPPP......", "...PSSPSSSP.....", "..PPSSPSSSPP....", "PPPPPPPPPPPPPPP.", "PPPPPPPPPPPPPPPY", "DDDDDDDDDDDDDDDD", "..KKK.....KKK...", "..KSK.....KSK...", "...K.......K...."] -%}
 {%- set PIN = ["..RRRR..", ".RRRRRR.", "RRWWWWRR", "RRWWWWRR", ".RRRRRR.", "..RRRR..", "...RR...", "....R..."] -%}
+{%- set STAR = ["...Y...", "..YYY..", "YYYYYYY", ".YYYYY.", ".YY.YY.", "YY...YY"] -%}
+{%- set STAR_OFF = ["...G...", "..GGG..", "GGGGGGG", ".GGGGG.", ".GG.GG.", "GG...GG"] -%}
 {%- set COIN = [".YYYY.", "YYOOYY", "YOYYOY", "YOYYOY", "YYOOYY", ".YYYY."] -%}
 {%- macro wx_icon(w, px=3) -%}{% if w.icon == "🌧" %}{{ sprite(RAIN, PAL, px) }}{% elif w.icon == "☁️" %}{{ sprite(CLOUD, PAL, px) }}{% else %}{{ sprite(SUN, PAL, px) }}{% endif %}{%- endmacro -%}
 <!doctype html>
@@ -133,6 +135,14 @@
   .pitem { background: var(--bg-dark); border: 2px solid var(--border); padding: 10px; }
   .pitem .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
   .hidden { display: none !important; }
+  .chip.visited { color: var(--warn); border-color: var(--warn); }
+  .chip.again { color: var(--ok); border-color: var(--ok); }
+  ol.log { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
+  ol.log li { background: var(--bg-dark); border: 2px solid var(--border); padding: 10px; }
+  ol.log .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stars { display: inline-flex; gap: 2px; }
+  .notice.howto { color: var(--muted); border-color: var(--border); }
+  .notice.howto b { color: var(--text); font-weight: 400; }
   footer { font: 12px/1.7 var(--font); color: var(--muted); border-top: 2px dashed var(--border); padding-top: 12px; }
 
   @media (max-width: 420px) {
@@ -150,7 +160,7 @@
     <div class="road">{{ sprite(CAR, PAL, 3, "car") }}</div>
   </header>
 
-  <nav><a href="#week">이번 주</a><a href="#cost">비용</a><a href="#places">장소 도감</a></nav>
+  <nav><a href="#week">이번 주</a><a href="#cost">비용</a><a href="#places">도감</a><a href="#log">기록</a></nav>
 
   <section id="week">
     {% for d in plan.days %}{% set w = d.weather %}
@@ -265,12 +275,41 @@
             <span class="nm">{{ p.name }} <span class="sub">{{ p.검증 }}</span></span>
             <span class="tag {{ 'in' if p.indoor == '실내' else 'out' }}">{{ p.category }}·{{ p.indoor }}</span>
           </div>
+          {% if p.id in recent_ids %}<div class="chips"><span class="chip visited">최근 방문 · 4주 추천 제외</span></div>{% endif %}
           <div class="sub">{{ p.area }}{% if p.baby_chair %} · {{ p.baby_chair }}아기의자{% endif %} · 주차: {{ p.parking.note }}</div>
           {% if p.price.note %}<div class="sub">{{ p.price.note }}</div>{% endif %}
           <a class="map" href="{{ p.kakao_url }}" target="_blank" rel="noopener">{{ sprite(PIN, PAL, 2) }} 카카오맵</a>
         </div>
         {% endfor %}
       </div>
+    </div>
+  </section>
+
+  <section id="log">
+    <div class="panel">
+      <div class="panel-title">LOG · 방문 기록</div>
+      {% if history %}
+      <ol class="log">
+        {% for v in history %}
+        <li>
+          <div class="row">
+            <span><span class="t">{{ v.date[5:] | replace("-", "/") }}</span> <span class="nm">{{ v.name }}</span></span>
+            {% if v.rating %}<span class="stars" aria-label="별점 {{ v.rating }}">{% for i in range(5) %}{{ sprite(STAR if i < v.rating else STAR_OFF, PAL, 2) }}{% endfor %}</span>{% endif %}
+          </div>
+          <div class="chips">
+            <span class="chip">{{ v.category }}</span>
+            {% if v.revisit %}<span class="chip again">또 가고 싶어요</span>
+            {% elif v.excluded %}<span class="chip visited">{{ v.until[5:] | replace("-", "/") }}까지 추천 제외</span>{% endif %}
+          </div>
+          {% if v.memo %}<div class="sub">“{{ v.memo }}”</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="sub">아직 기록이 없어요.</p>
+      {% endif %}
+      <div class="notice howto">기록 남기는 법 · GitHub 앱 → weekend-planner → Actions → <b>방문 기록 남기기</b> → Run workflow.
+        다녀온 요일·별점·메모를 고르면 끝! 다녀온 곳은 4주 동안 추천에서 빠져요. ‘또 가고 싶어요’를 체크하면 빠지지 않아요.</div>
     </div>
   </section>
 

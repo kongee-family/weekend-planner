@@ -14,7 +14,7 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write   # 이번 주 계획을 data/plans/ 에 보관 (방문 기록용)
   pages: write
   id-token: write
 
@@ -42,6 +42,16 @@ jobs:
 
       - name: 계획 생성 + 대시보드
         run: python src/planner.py --no-slack --no-open
+
+      - name: 이번 주 계획 보관 (나중에 '방문 기록'에서 사용)
+        run: |
+          mkdir -p data/plans
+          SAT=$(python -c "import json;print(json.load(open('output/plan.json'))['days'][0]['date'])")
+          cp output/plan.json "data/plans/$SAT.json"
+          git config user.name "weekend-planner-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/plans
+          git diff --cached --quiet || (git commit -m "계획 보관: $SAT" && git push)
 
       - name: 대시보드만 공개 폴더로 복사
         run: mkdir -p site && cp output/dashboard.html site/index.html

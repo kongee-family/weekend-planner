@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 import cost
 import places
 import publish
+import visits
 import weather
 from kakao_link import kakao_link
 from verify import verify
@@ -66,8 +67,8 @@ def build_course(day, d, verdict, cfg, recent):
     if not cands:
         return None
     main = cands[0]
-    lunch = places.match(main, "식당")
-    cafe = places.match(main, "카페") if day == "토" else None
+    lunch = places.match(main, "식당", exclude=recent)
+    cafe = places.match(main, "카페", exclude=recent) if day == "토" else None
     drive = main["drive"]["min"]
     at = lambda s: datetime.combine(d, datetime.strptime(s, "%H:%M").time())
 
@@ -104,8 +105,8 @@ def build_plan(today=None):
     load_dotenv(ROOT / ".env")
     cfg = load_config()
     origin = cfg["origin"]
-    recent = {v["id"] for v in cfg.get("recent_visits", [])}
     sat, sun = this_weekend(today)
+    recent = visits.recent_ids(sat)  # 최근 4주 방문지는 추천에서 제외
     web_ok = bool(places.load_places())
 
     days = []
@@ -119,6 +120,7 @@ def build_plan(today=None):
     return {"generated_at": datetime.now().isoformat(timespec="minutes"),
             "origin": origin["name"], "range": f"{sat.month}/{sat.day}~{sun.day}",
             "web_info_ok": web_ok, "days": days,
+            "recent_ids": sorted(recent), "history": visits.history(sat),
             "weekend_total": cost.weekend_total([x["options"][x["selected"]]["cost"] for x in days])}
 
 
@@ -147,8 +149,7 @@ def main():
         sys.exit(0 if ok else 1)
 
     plan = build_plan()
-    recent = {v["id"] for v in load_config().get("recent_visits", [])}
-    plan["verify"] = verify(plan, recent)
+    plan["verify"] = verify(plan, set(plan["recent_ids"]))
     OUTPUT.mkdir(exist_ok=True)
     (OUTPUT / "plan.json").write_text(json.dumps(plan, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     print_plan(plan)

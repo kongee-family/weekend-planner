@@ -1,0 +1,74 @@
+# 주말에 다녀온 곳을 기록한다. 휴대폰 GitHub 앱 → Actions → "방문 기록 남기기" → Run workflow.
+# 기록된 곳은 4주 동안 추천에서 빠지고(또 가고 싶어요 체크 시 제외 안 함), 대시보드 '기록' 탭에 보인다.
+name: 방문 기록 남기기
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "어느 날 다녀왔나요? (지난 확정안 기준)"
+        type: choice
+        options: ["토·일 모두", "토요일만", "일요일만"]
+        default: "토·일 모두"
+      rating:
+        description: "별점"
+        type: choice
+        options: ["선택 안 함", "5", "4", "3", "2", "1"]
+        default: "선택 안 함"
+      revisit:
+        description: "또 가고 싶어요 (체크하면 4주 제외 없이 다시 추천)"
+        type: boolean
+        default: false
+      memo:
+        description: "메모 (선택)"
+        type: string
+        required: false
+      names:
+        description: "계획과 다른 곳에 갔다면 장소 이름 (쉼표로 구분, 선택)"
+        type: string
+        required: false
+      date:
+        description: "그때 방문 날짜 YYYY-MM-DD (비우면 지난 토요일)"
+        type: string
+        required: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: weekly-plan
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul
+      V_DAYS: ${{ inputs.days }}
+      V_RATING: ${{ inputs.rating }}
+      V_REVISIT: ${{ inputs.revisit }}
+      V_MEMO: ${{ inputs.memo }}
+      V_NAMES: ${{ inputs.names }}
+      V_DATE: ${{ inputs.date }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: 방문 기록 추가
+        run: python src/visits.py record
+
+      - name: 기록 저장
+        run: |
+          git config user.name "weekend-planner-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/visits.json
+          git diff --cached --quiet || (git commit -m "방문 기록 추가" && git push)
+
+      - name: 대시보드 갱신 (슬랙 없이)
+        run: gh workflow run weekly.yml -f slack=false
+        env:
+          GH_TOKEN: ${{ github.token }}

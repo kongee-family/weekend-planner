@@ -29,7 +29,8 @@ def render_dashboard(plan, open_browser=True, style="classic", out=DASHBOARD):
     place_list = []
     for p in places.load_places():
         place_list.append({**p, "kakao_url": kakao_link(p)[0], "price": p.get("price", {})})
-    html = env.get_template(TEMPLATES[style]).render(plan=plan, items=cost.ITEMS, place_list=place_list)
+    html = env.get_template(TEMPLATES[style]).render(plan=plan, items=cost.ITEMS, place_list=place_list,
+                                                  history=plan.get("history", []), recent_ids=set(plan.get("recent_ids", [])))
     out.parent.mkdir(exist_ok=True)
     out.write_text(html, encoding="utf-8")
     if open_browser:

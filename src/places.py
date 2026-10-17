@@ -77,15 +77,16 @@ def _dist_km(a, b):
 
 
 def match(place, category, exclude=()):
-    """장소 근처 식당/카페. 같은 지역 → 가까운 좌표 → ✅ 우선. 노키즈존·❌ 제외."""
+    """장소 근처 식당/카페. 같은 지역 → 최근 안 간 곳 → 가까운 좌표 → ✅ 우선. 노키즈존·❌ 제외.
+    최근 방문(exclude)한 곳은 같은 지역에 대안이 있을 때만 밀어낸다 (멀리 보내지 않기 위해)."""
     pool = [p for p in load_places()
-            if p["category"] == category and p.get("검증") != "❌"
-            and not p.get("nokids") and p["id"] not in exclude]
+            if p["category"] == category and p.get("검증") != "❌" and not p.get("nokids")]
     if not pool:
         return None
     same_area = lambda p: 0 if p["area"] == place["area"] else 1
+    visited = lambda p: 1 if p["id"] in exclude else 0
     verified = lambda p: 0 if p.get("검증") == "✅" else 1
-    return sorted(pool, key=lambda p: (same_area(p), _dist_km(p, place), verified(p)))[0]
+    return sorted(pool, key=lambda p: (same_area(p), visited(p), _dist_km(p, place), verified(p)))[0]
 
 
 if __name__ == "__main__":
