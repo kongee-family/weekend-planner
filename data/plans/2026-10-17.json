@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T16:46",
+  "generated_at": "2026-10-17T17:03",
   "origin": "서울 양천구",
   "range": "10/17~18",
   "web_info_ok": true,
@@ -450,6 +450,8 @@
       }
     }
   ],
+  "recent_ids": [],
+  "history": [],
   "weekend_total": {
     "입장료": 8000,
     "식비": 48000,
