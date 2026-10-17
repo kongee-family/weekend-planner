@@ -44,6 +44,8 @@ jobs:
         run: python src/planner.py --no-slack --no-open
 
       - name: 이번 주 계획 보관 (나중에 '방문 기록'에서 사용)
+        # 슬랙으로 보낸 '확정안'만 보관한다. 대시보드만 새로고침하는 실행은 보관본을 덮어쓰지 않는다.
+        if: github.event_name == 'schedule' || inputs.slack
         run: |
           mkdir -p data/plans
           SAT=$(python -c "import json;print(json.load(open('output/plan.json'))['days'][0]['date'])")
