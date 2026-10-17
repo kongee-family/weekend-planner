@@ -1,0 +1,300 @@
+{#- 방안2: 픽셀 스타일 대시보드. 색·테두리·그림자는 pixel-agents(MIT)의 팔레트를 참고, 한글 픽셀 폰트는 Galmuri(OFL). -#}
+{%- macro sprite(rows, pal, px=3, cls="") -%}
+<svg class="sprite {{ cls }}" viewBox="0 0 {{ rows[0] | length }} {{ rows | length }}" width="{{ (rows[0] | length) * px }}" height="{{ (rows | length) * px }}" shape-rendering="crispEdges" aria-hidden="true">
+{%- for r in rows %}{% set y = loop.index0 %}{% for ch in r %}{% if ch != "." %}<rect x="{{ loop.index0 }}" y="{{ y }}" width="1" height="1" fill="{{ pal[ch] }}"/>{% endif %}{% endfor %}{% endfor -%}
+</svg>
+{%- endmacro -%}
+{%- set PAL = {"Y": "#ffd84a", "O": "#ff9f1c", "W": "#e8e8f4", "G": "#8a8aa8", "B": "#3794ff", "P": "#746fff", "D": "#4a3aa8", "K": "#0a0a14", "S": "#b8b8d0", "R": "#d14249", "L": "#89d185"} -%}
+{%- set SUN = ["....Y....", ".Y..Y..Y.", "..YYYYY..", "..YOOOY..", "YYYOOOYYY", "..YOOOY..", "..YYYYY..", ".Y..Y..Y.", "....Y...."] -%}
+{%- set CLOUD = ["....WWW.....", "...WWWWW.WW.", ".WWWWWWWWWWW", "WWWWWWWWWWWW", "WWWWWWWWWWWW", ".WWWWWWWWWW."] -%}
+{%- set RAIN = ["....GGG.....", "...GGGGG.GG.", ".GGGGGGGGGGG", "GGGGGGGGGGGG", ".GGGGGGGGGG.", "............", "..B...B...B.", ".B...B...B..", "............", "...B...B...B", "..B...B...B."] -%}
+{%- set CAR = ["....PPPPPP......", "...PSSPSSSP.....", "..PPSSPSSSPP....", "PPPPPPPPPPPPPPP.", "PPPPPPPPPPPPPPPY", "DDDDDDDDDDDDDDDD", "..KKK.....KKK...", "..KSK.....KSK...", "...K.......K...."] -%}
+{%- set PIN = ["..RRRR..", ".RRRRRR.", "RRWWWWRR", "RRWWWWRR", ".RRRRRR.", "..RRRR..", "...RR...", "....R..."] -%}
+{%- set COIN = [".YYYY.", "YYOOYY", "YOYYOY", "YOYYOY", "YYOOYY", ".YYYY."] -%}
+{%- macro wx_icon(w, px=3) -%}{% if w.icon == "🌧" %}{{ sprite(RAIN, PAL, px) }}{% elif w.icon == "☁️" %}{{ sprite(CLOUD, PAL, px) }}{% else %}{{ sprite(SUN, PAL, px) }}{% endif %}{%- endmacro -%}
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주말 나들이 플래너</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
+<style>
+  :root {
+    --bg: #1e1e2e; --bg-dark: #181828; --bg-thumb: #2a2a3a; --border: #4a4a6a;
+    --accent: #6030ff; --accent-bright: #746fff; --active-bg: #2c2b6d;
+    --text: rgba(255, 255, 255, 0.92); --muted: rgba(255, 255, 255, 0.55);
+    --btn: #353445; --btn-hover: #4e4b68;
+    --warn: #ff8d14; --gold: #ffd84a; --rain: #3794ff; --ok: #89d185; --danger: #d14249;
+    --shadow: 3px 3px 0 #0a0a14;
+    --font: Galmuri11, "Apple SD Gothic Neo", sans-serif;
+    --font-body: Galmuri14, Galmuri11, "Apple SD Gothic Neo", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg-dark); color: var(--text); font: 15px/1.6 var(--font-body);
+         -webkit-font-smoothing: none; font-smooth: never; }
+  main { max-width: 720px; margin: 0 auto; padding: 0 16px 48px; }
+  a { color: inherit; }
+  .sprite { image-rendering: pixelated; display: inline-block; vertical-align: middle; flex: none; }
+
+  /* ── 패널: 2px 테두리 + 각진 모서리 + 딱딱한 그림자 ── */
+  .panel { background: var(--bg); border: 2px solid var(--border); box-shadow: var(--shadow); padding: 14px; margin-bottom: 16px; }
+  .panel-title { font: 700 12px/1 var(--font); letter-spacing: 1px; color: var(--accent-bright); text-transform: uppercase;
+                 margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  .panel-title::before { content: ""; width: 6px; height: 6px; background: var(--accent-bright); }
+
+  /* ── 헤더: 도로 위를 달리는 픽셀 자동차 ── */
+  .hero { position: relative; margin: 0 -16px 16px; padding: 20px 16px 0; background: var(--bg);
+          border-bottom: 2px solid var(--border); overflow: hidden; }
+  .hero h1 { font: 700 24px/1.2 var(--font); margin: 0 0 6px; }
+  .hero p { margin: 0; color: var(--muted); font: 12px/1.5 var(--font); }
+  .road { position: relative; height: 44px; margin-top: 14px;
+          background: linear-gradient(var(--bg) 0 30px, #2a2a3a 30px 42px, var(--border) 42px 44px); }
+  .road::after { content: ""; position: absolute; left: 0; right: 0; top: 35px; height: 2px;
+                 background: repeating-linear-gradient(90deg, var(--gold) 0 12px, transparent 12px 24px); }
+  .road .car { position: absolute; bottom: 8px; left: -60px; animation: drive 9s steps(60) infinite; }
+  @keyframes drive { to { left: calc(100% + 10px); } }
+  @media (prefers-reduced-motion: reduce) { .road .car { animation: none; left: 16px; } }
+  .web-off { display: inline-block; margin-top: 8px; padding: 2px 6px; border: 2px solid var(--warn); color: var(--warn); font: 12px var(--font); }
+
+  /* ── 탭 ── */
+  nav { position: sticky; top: 0; z-index: 3; display: flex; gap: 8px; padding: 10px 0; background: var(--bg-dark); }
+  nav a { flex: 1; text-align: center; padding: 8px 4px; background: var(--btn); border: 2px solid var(--border);
+          box-shadow: var(--shadow); text-decoration: none; font: 12px/1.2 var(--font); }
+  nav a:active { transform: translate(3px, 3px); box-shadow: none; }
+
+  /* ── 요일 카드 ── */
+  .day-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .day-head h3 { margin: 0; font: 700 24px/1.2 var(--font); }
+  .day-head .kind { display: block; font: 12px var(--font); color: var(--muted); }
+  .tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 2px solid currentColor; font: 12px/1 var(--font); white-space: nowrap; }
+  .tag.in { color: var(--rain); } .tag.out { color: var(--ok); } .tag.warn { color: var(--warn); } .tag.gold { color: var(--gold); }
+
+  .status { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; background: var(--bg-dark);
+            border: 2px solid var(--border); padding: 10px; margin-bottom: 10px; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font: 12px/1.3 var(--font); }
+  .stat .k { color: var(--muted); }
+  .bar { height: 8px; background: var(--bg-thumb); border: 2px solid var(--border); margin-top: 3px; }
+  .bar > i { display: block; height: 100%; }
+  .why { font: 12px/1.6 var(--font); color: var(--muted); margin: 0 0 6px; }
+  .why b { color: var(--text); font-weight: 400; }
+  .src { font: 12px var(--font); color: var(--muted); }
+
+  .toggle { display: flex; gap: 8px; margin: 12px 0; }
+  .toggle button { flex: 1; padding: 8px; font: 12px var(--font); color: var(--muted); background: var(--btn);
+                   border: 2px solid var(--border); box-shadow: var(--shadow); cursor: pointer; }
+  .toggle button.on { color: #fff; background: var(--active-bg); border-color: var(--accent-bright); transform: translate(3px, 3px); box-shadow: none; }
+
+  /* ── 퀘스트 로그(시간표) ── */
+  ol.quest { list-style: none; margin: 0; padding: 0; border-left: 2px dashed var(--border); margin-left: 6px; }
+  ol.quest li { position: relative; padding: 0 0 14px 18px; }
+  ol.quest li::before { content: ""; position: absolute; left: -7px; top: 5px; width: 8px; height: 8px;
+                        background: var(--bg-dark); border: 2px solid var(--border); }
+  ol.quest li.stop::before { background: var(--accent-bright); border-color: var(--accent-bright); }
+  .t { font: 700 12px var(--font); color: var(--gold); margin-right: 6px; }
+  .lbl { font: 12px var(--font); color: var(--muted); }
+  .nm { font: 700 15px/1.4 var(--font-body); margin-top: 2px; }
+  .sub { font: 12px/1.5 var(--font); color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .chip { font: 12px/1 var(--font); padding: 3px 5px; background: var(--bg-thumb); border: 2px solid var(--border); }
+  a.map { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 5px 8px; font: 12px/1 var(--font);
+          text-decoration: none; background: var(--btn); border: 2px solid var(--border); box-shadow: var(--shadow); }
+  a.map:hover { background: var(--btn-hover); }
+  a.map:active { transform: translate(3px, 3px); box-shadow: none; }
+  .total { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding: 10px;
+           background: var(--bg-dark); border: 2px solid var(--gold); font: 700 15px var(--font); color: var(--gold); }
+  .alt { font: 12px var(--font); color: var(--muted); margin-top: 8px; }
+  .notice { font: 12px/1.6 var(--font); margin: 8px 0; padding: 8px; border: 2px dashed var(--warn); color: var(--warn); }
+
+  /* ── 비용: 인벤토리 바 ── */
+  .grid-cost { display: grid; grid-template-columns: 64px 1fr auto; gap: 8px 10px; align-items: center; font: 12px var(--font); }
+  .grid-cost .v { text-align: right; font-variant-numeric: tabular-nums; }
+  .grid-cost .bar { margin: 0; height: 12px; }
+  .grand { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 12px;
+           background: var(--active-bg); border: 2px solid var(--accent-bright); font: 700 24px/1 var(--font); }
+  .grand small { font: 12px var(--font); color: var(--muted); display: block; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font: 12px var(--font); margin-top: 12px; }
+  th, td { padding: 6px 4px; border-bottom: 2px solid var(--bg-thumb); text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 400; }
+  details { margin-top: 12px; font: 12px/1.7 var(--font); }
+  summary { cursor: pointer; padding: 6px 8px; background: var(--btn); border: 2px solid var(--border); list-style: none; }
+  summary::before { content: "▶ "; color: var(--accent-bright); }
+  details[open] summary::before { content: "▼ "; }
+  details ul { padding-left: 16px; color: var(--muted); }
+
+  /* ── 장소 도감 ── */
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .filters button { padding: 6px 10px; font: 12px var(--font); color: var(--text); background: var(--btn);
+                    border: 2px solid var(--border); box-shadow: var(--shadow); cursor: pointer; }
+  .filters button.on { background: var(--active-bg); border-color: var(--accent-bright); transform: translate(3px, 3px); box-shadow: none; }
+  .plist { display: grid; gap: 10px; }
+  .pitem { background: var(--bg-dark); border: 2px solid var(--border); padding: 10px; }
+  .pitem .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .hidden { display: none !important; }
+  footer { font: 12px/1.7 var(--font); color: var(--muted); border-top: 2px dashed var(--border); padding-top: 12px; }
+
+  @media (max-width: 420px) {
+    .stats { grid-template-columns: 1fr; }
+    .grand { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <h1>주말 나들이 플래너</h1>
+    <p>{{ plan.range }} · 출발 {{ plan.origin }} · 생성 {{ plan.generated_at | replace("T", " ") }}</p>
+    {% if not plan.web_info_ok %}<span class="web-off">! 웹 정보 미확보</span>{% endif %}
+    <div class="road">{{ sprite(CAR, PAL, 3, "car") }}</div>
+  </header>
+
+  <nav><a href="#week">이번 주</a><a href="#cost">비용</a><a href="#places">장소 도감</a></nav>
+
+  <section id="week">
+    {% for d in plan.days %}{% set w = d.weather %}
+    <div class="panel" data-day="{{ d.day }}">
+      <div class="panel-title">STAGE {{ loop.index }} · {{ "장거리 종일" if d.day == "토" else "근거리 반나절" }}</div>
+      <div class="day-head">
+        <h3>{{ d.label }}</h3>
+        <span class="tag {{ 'in' if d.selected == '실내' else 'out' }}">{{ d.selected }}안 추천</span>
+      </div>
+
+      <div class="status">
+        {{ wx_icon(w, 4) }}
+        {% if w.확인필요 %}
+        <div><span class="tag warn">날씨 확인 필요</span></div>
+        {% else %}
+        <div class="stats">
+          <div class="stat"><span class="k">기온</span> 최고 {{ w.temp }}℃ · 체감 {{ w.feels_min }}~{{ w.feels_max }}℃</div>
+          <div class="stat"><span class="k">강수</span> {{ w.rain_prob }}%
+            <div class="bar"><i style="width: {{ [w.rain_prob, 100] | min }}%; background: var(--rain)"></i></div></div>
+          <div class="stat"><span class="k">바람</span> {{ w.wind }}m/s
+            <div class="bar"><i style="width: {{ [w.wind / 9 * 100, 100] | min | round }}%; background: var(--ok)"></i></div></div>
+          <div class="stat"><span class="k">미세먼지</span> {{ w.pm_grade or "정보없음" }}
+            {% set pmw = {"좋음": 25, "보통": 50, "나쁨": 75, "매우나쁨": 100}.get(w.pm_grade, 0) %}
+            <div class="bar"><i style="width: {{ pmw }}%; background: {{ 'var(--danger)' if pmw >= 75 else 'var(--gold)' }}"></i></div></div>
+        </div>
+        {% endif %}
+      </div>
+      <p class="why">판정 근거 · <b>{{ w.근거 | join(" / ") }}</b></p>
+      <div class="src">출처: {{ w.source }}</div>
+      {% if w.plan_b %}<div class="notice">플랜 B · {{ w.plan_b }}</div>{% endif %}
+
+      <div class="toggle">
+        {% for v in ["실외", "실내"] %}{% if d.options[v] %}
+        <button type="button" class="{{ 'on' if v == d.selected }}" data-pick="{{ v }}">{{ v }}안{{ " ★" if v == d.selected }}</button>
+        {% endif %}{% endfor %}
+      </div>
+
+      {% for v in ["실외", "실내"] %}{% set o = d.options[v] %}{% if o %}
+      <div class="opt {{ '' if v == d.selected else 'hidden' }}" data-opt="{{ v }}">
+        <ol class="quest">
+          {% for r in o.timeline %}
+          <li class="{{ 'stop' if r.stop }}">
+            <span class="t">{{ r.time }}</span><span class="lbl">{{ r.label }}</span>
+            {% if r.stop %}
+            <div class="nm">{{ r.stop.name }} <span class="sub">{{ r.stop.검증 }}</span></div>
+            {% if r.stop.badges %}<div class="chips">{% for b in r.stop.badges %}<span class="chip">{{ b }}</span>{% endfor %}</div>{% endif %}
+            {% if r.stop.note %}<div class="sub">{{ r.stop.note }}</div>{% endif %}
+            <a class="map" href="{{ r.stop.kakao_url }}" target="_blank" rel="noopener">{{ sprite(PIN, PAL, 2) }} 카카오맵 {{ r.stop.link_type }}</a>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+        {% if o.reservation %}<div class="notice">! 예약 필요 — 방문 전 공식 홈페이지에서 예약·운영 여부를 확인하세요.</div>{% endif %}
+        <div class="total"><span>{{ sprite(COIN, PAL, 3) }} {{ d.day }} 예상</span><span>{{ "{:,}".format(o.cost.합계) }}원</span></div>
+        {% if o.alternatives %}<div class="alt">다른 후보 · {{ o.alternatives | join(", ") }}</div>{% endif %}
+      </div>
+      {% endif %}{% endfor %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <section id="cost">
+    <div class="panel">
+      <div class="panel-title">INVENTORY · 비용 요약 (예상)</div>
+      {% set ns = namespace(top=0) %}{% for k in items %}{% if plan.weekend_total[k] > ns.top %}{% set ns.top = plan.weekend_total[k] %}{% endif %}{% endfor %}
+      {% set top = ns.top %}
+      <div class="grid-cost">
+        {% for k in items %}{% set v = plan.weekend_total[k] %}
+        <span>{{ k }}</span>
+        <div class="bar"><i style="width: {{ (v / top * 100) | round if top else 0 }}%; background: var(--accent-bright)"></i></div>
+        <span class="v">{{ "{:,}".format(v) }}</span>
+        {% endfor %}
+      </div>
+      <div class="grand"><div><small>주말 합계</small>{{ sprite(COIN, PAL, 3) }}</div><span>{{ "{:,}".format(plan.weekend_total.합계) }}원</span></div>
+
+      <table>
+        <thead><tr><th>항목</th>{% for d in plan.days %}<th>{{ d.day }}·{{ d.selected }}</th>{% endfor %}<th>주말</th></tr></thead>
+        <tbody>
+          {% for k in items %}
+          <tr><td>{{ k }}</td>{% for d in plan.days %}<td>{{ "{:,}".format(d.options[d.selected].cost[k].amount) }}</td>{% endfor %}<td>{{ "{:,}".format(plan.weekend_total[k]) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <details>
+        <summary>산출 근거 보기</summary>
+        {% for d in plan.days %}
+        <p>{{ d.label }}</p>
+        <ul>{% for k in items %}<li>{{ k }}: {{ d.options[d.selected].cost[k].근거 }}</li>{% endfor %}</ul>
+        {% endfor %}
+        <p>※ 모든 금액은 웹검색·공식 요금 기준 예상치입니다. 메뉴·요금·주차 조건은 방문 전 확인하세요.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="places">
+    <div class="panel">
+      <div class="panel-title">COLLECTION · 장소 도감</div>
+      <div class="filters" id="filters">
+        <button type="button" data-f="all" class="on">전체</button>
+        <button type="button" data-f="ok">✅ 검증</button>
+        <button type="button" data-f="warn">⚠️ 확인 필요</button>
+        <button type="button" data-f="chair">아기의자</button>
+        <button type="button" data-f="park">주차</button>
+        <button type="button" data-f="indoor">실내</button>
+      </div>
+      <div class="plist">
+        {% for p in place_list %}
+        <div class="pitem" data-ok="{{ 1 if p.검증 == '✅' else 0 }}" data-warn="{{ 1 if p.검증 == '⚠️' else 0 }}"
+             data-chair="{{ 1 if p.baby_chair == '✅' else 0 }}" data-park="{{ 1 if p.parking.available else 0 }}"
+             data-indoor="{{ 1 if p.indoor in ['실내', '혼합'] else 0 }}">
+          <div class="row">
+            <span class="nm">{{ p.name }} <span class="sub">{{ p.검증 }}</span></span>
+            <span class="tag {{ 'in' if p.indoor == '실내' else 'out' }}">{{ p.category }}·{{ p.indoor }}</span>
+          </div>
+          <div class="sub">{{ p.area }}{% if p.baby_chair %} · {{ p.baby_chair }}아기의자{% endif %} · 주차: {{ p.parking.note }}</div>
+          {% if p.price.note %}<div class="sub">{{ p.price.note }}</div>{% endif %}
+          <a class="map" href="{{ p.kakao_url }}" target="_blank" rel="noopener">{{ sprite(PIN, PAL, 2) }} 카카오맵</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <footer>⚠️ 표시는 웹검색 기반으로 아직 직접 확인하지 않은 정보입니다. 다녀온 뒤 data/places.json 에서 ✅로 바꿔 주세요.<br>
+    픽셀 폰트: Galmuri (SIL OFL 1.1) · 색 구성 참고: pixel-agents (MIT)</footer>
+</main>
+<script>
+  document.querySelectorAll('[data-day]').forEach(function (card) {
+    card.querySelectorAll('[data-pick]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        card.querySelectorAll('[data-pick]').forEach(function (b) { b.classList.toggle('on', b === btn); });
+        card.querySelectorAll('[data-opt]').forEach(function (o) { o.classList.toggle('hidden', o.dataset.opt !== btn.dataset.pick); });
+      });
+    });
+  });
+  document.querySelectorAll('#filters button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#filters button').forEach(function (b) { b.classList.toggle('on', b === btn); });
+      var f = btn.dataset.f;
+      document.querySelectorAll('.pitem').forEach(function (it) {
+        it.classList.toggle('hidden', f !== 'all' && it.dataset[f] !== '1');
+      });
+    });
+  });
+</script>
+</body>
+</html>

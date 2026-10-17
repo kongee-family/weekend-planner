@@ -32,5 +32,6 @@
   },
   "slack_channel": "#주말-나들이",
   "recent_visits": [],
-  "slack_channel_id": "C0CA47H6S68"
+  "slack_channel_id": "C0CA47H6S68",
+  "dashboard_style": "pixel"
 }

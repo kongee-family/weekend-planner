@@ -159,7 +159,8 @@ def main():
     for msg in v["issues"]:
         print(f"   ❗ {msg}")
 
-    path = publish.render_dashboard(plan, open_browser="--no-open" not in sys.argv)
+    path = publish.render_dashboard(plan, open_browser="--no-open" not in sys.argv,
+                                    style=load_config().get("dashboard_style", "classic"))
     print(f"📊 대시보드: {path}")
     if not no_slack:
         publish.send_slack(publish.slack_text(plan, publish.dashboard_ref()))

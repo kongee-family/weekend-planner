@@ -20,17 +20,21 @@ DASHBOARD = ROOT / "output" / "dashboard.html"
 
 
 # ───────────────────────── 대시보드 ─────────────────────────
-def render_dashboard(plan, open_browser=True):
+TEMPLATES = {"classic": "dashboard.html.j2", "pixel": "dashboard_pixel.html.j2"}
+
+
+def render_dashboard(plan, open_browser=True, style="classic", out=DASHBOARD):
+    """style: 'classic'(방안1) | 'pixel'(방안2, 픽셀 스타일)"""
     env = Environment(loader=FileSystemLoader(Path(__file__).parent / "templates"), autoescape=True)
     place_list = []
     for p in places.load_places():
         place_list.append({**p, "kakao_url": kakao_link(p)[0], "price": p.get("price", {})})
-    html = env.get_template("dashboard.html.j2").render(plan=plan, items=cost.ITEMS, place_list=place_list)
-    DASHBOARD.parent.mkdir(exist_ok=True)
-    DASHBOARD.write_text(html, encoding="utf-8")
+    html = env.get_template(TEMPLATES[style]).render(plan=plan, items=cost.ITEMS, place_list=place_list)
+    out.parent.mkdir(exist_ok=True)
+    out.write_text(html, encoding="utf-8")
     if open_browser:
-        webbrowser.open(DASHBOARD.as_uri())
-    return DASHBOARD
+        webbrowser.open(out.as_uri())
+    return out
 
 
 def dashboard_ref():

@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: "0 12 * * 4"   # UTC 12:00 = 한국 21:00, 목요일
   workflow_dispatch:
+    inputs:
+      slack:
+        description: "슬랙으로도 보낼까요? (끄면 대시보드만 갱신)"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -49,6 +54,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: 슬랙 전송
+        if: github.event_name == 'schedule' || inputs.slack
         run: python src/planner.py --send-only
         env:
           DASHBOARD_URL: ${{ steps.deploy.outputs.page_url }}
