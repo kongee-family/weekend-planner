@@ -1,0 +1,210 @@
+{
+  "_안내": [
+    "검증 리스트. 처음 20곳은 2026-10-17 웹검색(블로그·기사)으로 조사한 값이라 모두 '⚠️'(확인 필요)입니다.",
+    "직접 다녀와서 아기의자·주차·요금이 맞으면 해당 장소의 \"검증\": \"⚠️\" 를 \"✅\" 로 바꾸세요. 아니면 \"❌\" 로 바꾸면 추천에서 빠집니다.",
+    "baby_chair·low_salt·spacious·nursing_room 값: \"✅\" 확인됨 / \"⚠️\" 확인 필요 / \"❌\" 없음.",
+    "kakao_id: 카카오맵에서 장소를 열면 주소창이 place.map.kakao.com/숫자 — 그 숫자를 넣으면 가장 정확한 링크가 됩니다.",
+    "lat·lng 가 null 이면 '지역명+장소명' 검색 링크로 대신합니다.",
+    "drive: 출발지(양천구) 기준 편도 추정값. 통행료는 무료도로 경로 기준 0원."
+  ],
+  "places": [
+    {
+      "id": "p01", "name": "서울대공원 동물원", "category": "장소", "sub": "동물", "area": "과천",
+      "lat": 37.4275, "lng": 127.0170, "kakao_id": null, "indoor": "실외",
+      "tags": ["동물", "잔디", "코끼리열차"], "season": ["봄", "가을"], "day_fit": ["토"],
+      "nursing_room": "⚠️", "stroller": "✅",
+      "parking": {"available": true, "rule": "flat", "fee": 5000, "note": "대공원주차장 1일 5,000원"},
+      "price": {"adult": 2000, "baby": 0, "note": "성인 2,000원 · 만 5세 이하 무료"},
+      "drive": {"km": 22, "min": 40, "toll": 0},
+      "reservation": false, "closed": "", "검증": "⚠️",
+      "source": "https://www.seoul.go.kr/storyw/campingjang/park.do"
+    },
+    {
+      "id": "p02", "name": "국립과천과학관", "category": "장소", "sub": "키즈체험", "area": "과천",
+      "lat": 37.4363, "lng": 127.0057, "kakao_id": null, "indoor": "실내",
+      "tags": ["유아체험관", "탈것"], "season": ["사계절"], "day_fit": ["토"],
+      "nursing_room": "⚠️", "stroller": "✅",
+      "parking": {"available": true, "rule": "flat", "fee": 5000, "note": "일반차량 5,000원(후기 기준)"},
+      "price": {"adult": 4000, "baby": 0, "note": "성인 4,000원 · 7세 미만 무료 · 유아체험관은 2일 전 온라인 예약"},
+      "drive": {"km": 21, "min": 40, "toll": 0},
+      "reservation": true, "closed": "월", "검증": "⚠️",
+      "source": "https://www.yugacrew.com/crewtalk/20741"
+    },
+    {
+      "id": "p03", "name": "시흥갯골생태공원", "category": "장소", "sub": "잔디", "area": "시흥",
+      "lat": 37.3893, "lng": 126.7810, "kakao_id": null, "indoor": "실외",
+      "tags": ["잔디", "억새", "흔들전망대"], "season": ["가을"], "day_fit": ["토"],
+      "nursing_room": "⚠️", "stroller": "✅",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "생태주차장 약 250대 무료(2022 기사)"},
+      "price": {"adult": 0, "baby": 0, "note": "입장 무료"},
+      "drive": {"km": 22, "min": 40, "toll": 0},
+      "reservation": false, "closed": "", "검증": "⚠️",
+      "source": "https://www.telltrip.com/domestic-travel/siheung-gaetgol-ecological-park-guide/"
+    },
+    {
+      "id": "p04", "name": "아쿠아플라넷 일산", "category": "장소", "sub": "동물", "area": "일산",
+      "lat": 37.6650, "lng": 126.7465, "kakao_id": null, "indoor": "실내",
+      "tags": ["아쿠아리움", "동물"], "season": ["사계절"], "day_fit": ["토"],
+      "nursing_room": "⚠️", "stroller": "⚠️",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "관람 시 3시간 무료(후기 기준)"},
+      "price": {"adult": 39000, "baby": 0, "note": "정상가 39,000원 · 36개월 미만 무료(증빙 필수) · 온라인 할인가 있음"},
+      "drive": {"km": 25, "min": 40, "toll": 0},
+      "reservation": false, "closed": "", "검증": "⚠️",
+      "source": "https://mom-mom.net/travel/places/66ebbb2d0d5532e275618bfd"
+    },
+    {
+      "id": "p05", "name": "의왕 철도박물관", "category": "장소", "sub": "탈것", "area": "의왕",
+      "lat": 37.3204, "lng": 126.9478, "kakao_id": null, "indoor": "혼합",
+      "tags": ["기차", "탈것"], "season": ["봄", "가을"], "day_fit": ["토"],
+      "nursing_room": "⚠️", "stroller": "⚠️",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "주차장 있음, 점심 이후 만차"},
+      "price": {"adult": 2000, "baby": 0, "note": "성인 2,000원(후기) · 사전예약제 여부 확인"},
+      "drive": {"km": 28, "min": 50, "toll": 0},
+      "reservation": true, "closed": "월", "검증": "⚠️",
+      "source": "https://mom-mom.net/travel/places/65d3fca3492c156da9e4bd87"
+    },
+    {
+      "id": "p06", "name": "인천어린이과학관", "category": "장소", "sub": "키즈체험", "area": "인천 계양",
+      "lat": 37.5520, "lng": 126.7360, "kakao_id": null, "indoor": "실내",
+      "tags": ["키즈체험", "오감놀이"], "season": ["사계절"], "day_fit": ["토"],
+      "nursing_room": "⚠️", "stroller": "⚠️",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "주차 정보 확인 필요"},
+      "price": {"adult": 4000, "baby": 0, "note": "성인 4,000원(2011 개관 기준) · 사전예약제"},
+      "drive": {"km": 16, "min": 30, "toll": 0},
+      "reservation": true, "closed": "월", "검증": "⚠️",
+      "source": "https://www.yugacrew.com/crewtalk/20903"
+    },
+    {
+      "id": "p07", "name": "국립항공박물관", "category": "장소", "sub": "탈것", "area": "강서 공항동",
+      "lat": 37.5640, "lng": 126.8087, "kakao_id": null, "indoor": "실내",
+      "tags": ["비행기", "탈것", "항공배움놀이터"], "season": ["사계절"], "day_fit": ["일"],
+      "nursing_room": "⚠️", "stroller": "✅",
+      "parking": {"available": true, "rule": "hourly", "free_min": 30, "first": 1000, "per15": 500, "note": "30분 무료, 초과 1,000원 + 15분당 500원"},
+      "price": {"adult": 0, "baby": 0, "note": "상설전시 무료 · '푸릉푸릉 항공 걸음마'(24~48개월) 별도 예약"},
+      "drive": {"km": 8, "min": 20, "toll": 0},
+      "reservation": false, "closed": "월", "검증": "⚠️",
+      "source": "https://mediahub.seoul.go.kr/archives/2009853"
+    },
+    {
+      "id": "p08", "name": "서울식물원", "category": "장소", "sub": "잔디", "area": "강서 마곡",
+      "lat": 37.5694, "lng": 126.8350, "kakao_id": null, "indoor": "혼합",
+      "tags": ["잔디", "호수", "온실"], "season": ["봄", "가을"], "day_fit": ["일"],
+      "nursing_room": "✅", "stroller": "✅",
+      "parking": {"available": true, "rule": "hourly", "free_min": 0, "first": 0, "per15": 750, "note": "공영 요금(시간제) — 정확 요금 확인 필요"},
+      "price": {"adult": 5000, "baby": 0, "note": "온실·주제원 성인 5,000원 · 6세 미만 무료 · 호수원·열린숲 무료"},
+      "drive": {"km": 7, "min": 20, "toll": 0},
+      "reservation": false, "closed": "월", "검증": "⚠️",
+      "source": "https://mom-mom.net/travel/places/64649e827aebe9d97c9af9c2"
+    },
+    {
+      "id": "p09", "name": "서서울호수공원", "category": "장소", "sub": "잔디", "area": "양천 신월동",
+      "lat": 37.5276, "lng": 126.8340, "kakao_id": null, "indoor": "실외",
+      "tags": ["잔디", "호수", "놀이터"], "season": ["봄", "여름", "가을"], "day_fit": ["일"],
+      "nursing_room": "⚠️", "stroller": "✅",
+      "parking": {"available": true, "rule": "hourly", "free_min": 0, "first": 0, "per15": 150, "note": "공영주차장 1시간 600원 · 서서울예술교육센터 무료"},
+      "price": {"adult": 0, "baby": 0, "note": "입장 무료"},
+      "drive": {"km": 3, "min": 10, "toll": 0},
+      "reservation": false, "closed": "", "검증": "⚠️",
+      "source": "https://mediahub.seoul.go.kr/archives/2015180"
+    },
+    {
+      "id": "p10", "name": "국립중앙박물관 어린이박물관", "category": "장소", "sub": "어린이박물관", "area": "용산",
+      "lat": 37.5240, "lng": 126.9803, "kakao_id": null, "indoor": "실내",
+      "tags": ["어린이박물관", "키즈체험"], "season": ["사계절"], "day_fit": ["일"],
+      "nursing_room": "✅", "stroller": "✅",
+      "parking": {"available": true, "rule": "hourly", "free_min": 0, "first": 1000, "first_min": 60, "per10": 500, "note": "60분 1,000원, 이후 10분당 500원"},
+      "price": {"adult": 0, "baby": 0, "note": "무료 · 회차별 온라인 예약"},
+      "drive": {"km": 15, "min": 35, "toll": 0},
+      "reservation": true, "closed": "", "검증": "⚠️",
+      "source": "https://mediahub.seoul.go.kr/archives/2007071"
+    },
+
+    {
+      "id": "r01", "name": "또와요짬뽕 시흥점", "category": "식당", "sub": "중식", "area": "시흥",
+      "lat": null, "lng": null, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "✅", "low_salt": "⚠️", "spacious": "✅", "nursing_room": "⚠️",
+      "menu_hint": "짜장·볶음밥(아기는 흰밥+계란)",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "넉넉한 주차(후기)"},
+      "price": {"adult_avg": 11000, "baby_menu": 3000},
+      "검증": "⚠️", "source": "https://mom-mom.net/travel/places/6780f6b056c51cf7f748585e"
+    },
+    {
+      "id": "r02", "name": "국립과천과학관 푸드코트", "category": "식당", "sub": "푸드코트", "area": "과천",
+      "lat": 37.4363, "lng": 127.0057, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "low_salt": "⚠️", "spacious": "✅", "nursing_room": "⚠️",
+      "menu_hint": "돈가스·우동·덮밥 등",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "과학관 주차장 이용"},
+      "price": {"adult_avg": 10000, "baby_menu": 3000},
+      "검증": "⚠️", "source": ""
+    },
+    {
+      "id": "r03", "name": "현대백화점 킨텍스점 식당가", "category": "식당", "sub": "식당가", "area": "일산",
+      "lat": 37.6695, "lng": 126.7510, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "low_salt": "⚠️", "spacious": "✅", "nursing_room": "⚠️",
+      "menu_hint": "한식·솥밥·국수 등 선택 폭 넓음",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "구매 시 무료(조건 확인)"},
+      "price": {"adult_avg": 14000, "baby_menu": 3000},
+      "검증": "⚠️", "source": ""
+    },
+    {
+      "id": "r04", "name": "국립중앙박물관 한식미관", "category": "식당", "sub": "푸드코트", "area": "용산",
+      "lat": 37.5240, "lng": 126.9803, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "low_salt": "⚠️", "spacious": "✅", "nursing_room": "⚠️",
+      "menu_hint": "국·탕·비빔 코너 (약 310석)",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "박물관 주차장 이용"},
+      "price": {"adult_avg": 11000, "baby_menu": 3000},
+      "검증": "⚠️", "source": "https://www.newsis.com/view/NISX20260721_0003717020"
+    },
+    {
+      "id": "r05", "name": "호호방 마곡", "category": "식당", "sub": "중식", "area": "강서 마곡",
+      "lat": null, "lng": null, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "low_salt": "⚠️", "spacious": "⚠️", "nursing_room": "⚠️",
+      "menu_hint": "식물원 관람 후 식사 추천(후기)",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "건물 주차 확인 필요"},
+      "price": {"adult_avg": 13000, "baby_menu": 3000},
+      "검증": "⚠️", "source": "https://www.trvlogue.com/ko/seoul-botanical-garden-review"
+    },
+    {
+      "id": "r06", "name": "현대백화점 목동점 식당가", "category": "식당", "sub": "식당가", "area": "양천 목동",
+      "lat": 37.5268, "lng": 126.8752, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "low_salt": "⚠️", "spacious": "✅", "nursing_room": "⚠️",
+      "menu_hint": "한식·솥밥·생선구이 등 선택 폭 넓음",
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "구매 시 무료(조건 확인)"},
+      "price": {"adult_avg": 14000, "baby_menu": 3000},
+      "검증": "⚠️", "source": ""
+    },
+
+    {
+      "id": "c01", "name": "레이크우드 물왕저수지", "category": "카페", "sub": "베이커리카페", "area": "시흥",
+      "lat": null, "lng": null, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "✅", "spacious": "✅", "nokids": false,
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "전용 주차장"},
+      "price": {"drink_avg": 7000, "snack": 6000},
+      "검증": "⚠️", "source": "https://mom-mom.net/travel/places/6780f6b056c51cf7f748585e"
+    },
+    {
+      "id": "c02", "name": "카페 언트 과천", "category": "카페", "sub": "대형카페", "area": "과천",
+      "lat": null, "lng": null, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "spacious": "✅", "nokids": false,
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "주차 넓음(후기)"},
+      "price": {"drink_avg": 7000, "snack": 6000},
+      "검증": "⚠️", "source": "https://web.getcha.kr/community/all/68499?topic=13"
+    },
+    {
+      "id": "c03", "name": "아쿠아가든 일산점", "category": "카페", "sub": "수족관카페", "area": "일산",
+      "lat": null, "lng": null, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "✅", "spacious": "✅", "nokids": false,
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "무료 주차(후기)"},
+      "price": {"drink_avg": 7000, "snack": 6000},
+      "검증": "⚠️", "source": "https://mom-mom.net/travel/places/66ebbb2d0d5532e275618bfd"
+    },
+    {
+      "id": "c04", "name": "플라워플로우 마곡", "category": "카페", "sub": "대형카페", "area": "강서 마곡",
+      "lat": null, "lng": null, "kakao_id": null, "indoor": "실내",
+      "baby_chair": "⚠️", "spacious": "✅", "nokids": false,
+      "parking": {"available": true, "rule": "free", "fee": 0, "note": "건물 주차 확인 필요"},
+      "price": {"drink_avg": 7000, "snack": 6000},
+      "검증": "⚠️", "source": "https://mom-mom.net/travel/places/6a067a31c97ee143623c2f44"
+    }
+  ]
+}

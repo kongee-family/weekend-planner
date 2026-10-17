@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주말 나들이 플래너</title>
+<style>
+  :root {
+    --bg: #f6f4ef; --card: #ffffff; --ink: #1f2420; --muted: #6b716c; --line: #e4e1d8;
+    --accent: #2f7a5b; --accent-soft: #e3f1ea; --warn: #b7791f; --warn-soft: #fbf0dc;
+    --rain: #3c6ea8; --rain-soft: #e3ecf7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161917; --card: #202422; --ink: #ecefeb; --muted: #9aa29c; --line: #333936;
+      --accent: #6cc59d; --accent-soft: #1f3a2e; --warn: #e6b45a; --warn-soft: #3a2f1b;
+      --rain: #8db4e6; --rain-soft: #1e2b3d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161917; --card: #202422; --ink: #ecefeb; --muted: #9aa29c; --line: #333936;
+    --accent: #6cc59d; --accent-soft: #1f3a2e; --warn: #e6b45a; --warn-soft: #3a2f1b;
+    --rain: #8db4e6; --rain-soft: #1e2b3d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
+  header h1 { font-size: 22px; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+  nav { display: flex; gap: 6px; margin: 16px 0; position: sticky; top: 0; background: var(--bg); padding: 8px 0; z-index: 2; }
+  nav a { flex: 1; text-align: center; padding: 8px 4px; border-radius: 10px; border: 1px solid var(--line);
+          color: var(--ink); text-decoration: none; font-size: 14px; background: var(--card); }
+  section { margin-bottom: 28px; }
+  h2 { font-size: 17px; margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .day-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .day-head h3 { margin: 0; font-size: 18px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .b-in { background: var(--rain-soft); color: var(--rain); }
+  .b-out { background: var(--accent-soft); color: var(--accent); }
+  .b-warn { background: var(--warn-soft); color: var(--warn); }
+  .wx { color: var(--muted); font-size: 13px; margin: 6px 0 10px; }
+  .reason { font-size: 13px; margin: 0 0 10px; }
+  .toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+  .toggle button { border: 0; background: transparent; color: var(--muted); padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+  .toggle button.on { background: var(--accent); color: #fff; }
+  ol.tl { list-style: none; margin: 0; padding: 0; }
+  ol.tl li { display: grid; grid-template-columns: 52px 1fr; gap: 10px; padding: 9px 0; border-top: 1px dashed var(--line); }
+  ol.tl li:first-child { border-top: 0; }
+  .t { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); }
+  .lbl { color: var(--muted); font-size: 13px; }
+  .nm { font-weight: 600; }
+  .sub { font-size: 12px; color: var(--muted); }
+  a.map { display: inline-block; margin-top: 4px; font-size: 13px; color: var(--accent); text-decoration: none;
+          border: 1px solid var(--accent); border-radius: 8px; padding: 2px 8px; }
+  .total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-weight: 600; }
+  .alt { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  tfoot td { font-weight: 700; border-bottom: 0; }
+  details { margin-top: 10px; font-size: 13px; }
+  details li { margin: 4px 0; color: var(--muted); }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .filters button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px;
+                    padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .filters button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .plist { display: grid; gap: 8px; }
+  .pitem { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .pitem .row { display: flex; justify-content: space-between; gap: 8px; }
+  .note { font-size: 12px; color: var(--muted); }
+  .hidden { display: none !important; }
+  footer { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🚗 주말 나들이 플래너</h1>
+    <p>{{ plan.range }} · 출발 {{ plan.origin }} · 생성 {{ plan.generated_at | replace("T", " ") }}</p>
+    {% if not plan.web_info_ok %}<p><span class="badge b-warn">웹 정보 미확보</span></p>{% endif %}
+  </header>
+
+  <nav>
+    <a href="#week">이번 주</a><a href="#cost">비용</a><a href="#places">장소 리스트</a>
+  </nav>
+
+  <section id="week">
+    <h2>⭐ 이번 주 확정안</h2>
+    {% for d in plan.days %}
+    {% set w = d.weather %}
+    <div class="card" data-day="{{ d.day }}">
+      <div class="day-head">
+        <h3>{{ d.label }} · {{ "장거리 종일" if d.day == "토" else "근거리 반나절" }}</h3>
+        <span class="badge {{ 'b-in' if d.selected == '실내' else 'b-out' }}">{{ w.icon }} {{ d.selected }}안 추천</span>
+      </div>
+      <div class="wx">
+        {% if w.확인필요 %}<span class="badge b-warn">날씨 확인 필요</span>
+        {% else %}최고 {{ w.temp }}℃ · 체감 {{ w.feels_min }}~{{ w.feels_max }}℃ · 강수 {{ w.rain_prob }}% · 바람 {{ w.wind }}m/s · 미세먼지 {{ w.pm_grade or "정보없음" }}{% endif %}
+        <br><span class="sub">출처: {{ w.source }}</span>
+      </div>
+      <p class="reason">판정 근거: {{ w.근거 | join(" / ") }}</p>
+      {% if w.plan_b %}<p class="reason"><span class="badge b-warn">플랜 B</span> {{ w.plan_b }}</p>{% endif %}
+
+      <div class="toggle" role="tablist">
+        {% for v in ["실외", "실내"] %}{% if d.options[v] %}
+        <button type="button" class="{{ 'on' if v == d.selected }}" data-pick="{{ v }}">{{ v }}안{{ " (추천)" if v == d.selected }}</button>
+        {% endif %}{% endfor %}
+      </div>
+
+      {% for v in ["실외", "실내"] %}{% set o = d.options[v] %}{% if o %}
+      <div class="opt {{ '' if v == d.selected else 'hidden' }}" data-opt="{{ v }}">
+        <ol class="tl">
+          {% for r in o.timeline %}
+          <li>
+            <span class="t">{{ r.time }}</span>
+            <div>
+              <div class="lbl">{{ r.label }}</div>
+              {% if r.stop %}
+              <div class="nm">{{ r.stop.name }} <span class="sub">{{ r.stop.검증 }}</span></div>
+              {% if r.stop.badges %}<div class="sub">{{ r.stop.badges | join(" · ") }}</div>{% endif %}
+              {% if r.stop.note %}<div class="sub">{{ r.stop.note }}</div>{% endif %}
+              <a class="map" href="{{ r.stop.kakao_url }}" target="_blank" rel="noopener">🗺 카카오맵 ({{ r.stop.link_type }})</a>
+              {% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        {% if o.reservation %}<p class="reason"><span class="badge b-warn">예약 필요</span> 방문 전 공식 홈페이지에서 예약·운영 여부를 확인하세요.</p>{% endif %}
+        <div class="total"><span>💰 {{ d.day }} 예상</span><span>{{ "{:,}".format(o.cost.합계) }}원</span></div>
+        {% if o.alternatives %}<div class="alt">다른 후보: {{ o.alternatives | join(", ") }}</div>{% endif %}
+      </div>
+      {% endif %}{% endfor %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <section id="cost">
+    <h2>💰 비용 요약 (예상)</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>항목</th>{% for d in plan.days %}<th>{{ d.day }} ({{ d.selected }})</th>{% endfor %}<th>주말</th></tr></thead>
+        <tbody>
+          {% for k in items %}
+          <tr><td>{{ k }}</td>{% for d in plan.days %}<td>{{ "{:,}".format(d.options[d.selected].cost[k].amount) }}</td>{% endfor %}<td>{{ "{:,}".format(plan.weekend_total[k]) }}</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot><tr><td>합계</td>{% for d in plan.days %}<td>{{ "{:,}".format(d.options[d.selected].cost.합계) }}</td>{% endfor %}<td>{{ "{:,}".format(plan.weekend_total.합계) }}원</td></tr></tfoot>
+      </table>
+      <details>
+        <summary>산출 근거 보기</summary>
+        {% for d in plan.days %}
+        <p><b>{{ d.label }}</b></p>
+        <ul>{% for k in items %}<li>{{ k }}: {{ d.options[d.selected].cost[k].근거 }}</li>{% endfor %}</ul>
+        {% endfor %}
+        <p class="note">※ 모든 금액은 웹검색·공식 요금 기준 예상치입니다. 메뉴·요금·주차 조건은 방문 전 확인하세요.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="places">
+    <h2>📍 장소 리스트</h2>
+    <div class="filters" id="filters">
+      <button type="button" data-f="all" class="on">전체</button>
+      <button type="button" data-f="ok">✅ 검증</button>
+      <button type="button" data-f="warn">⚠️ 확인 필요</button>
+      <button type="button" data-f="chair">아기의자</button>
+      <button type="button" data-f="park">주차</button>
+      <button type="button" data-f="indoor">실내</button>
+    </div>
+    <div class="plist">
+      {% for p in place_list %}
+      <div class="pitem" data-ok="{{ 1 if p.검증 == '✅' else 0 }}" data-warn="{{ 1 if p.검증 == '⚠️' else 0 }}"
+           data-chair="{{ 1 if p.baby_chair == '✅' else 0 }}" data-park="{{ 1 if p.parking.available else 0 }}"
+           data-indoor="{{ 1 if p.indoor in ['실내', '혼합'] else 0 }}">
+        <div class="row">
+          <span class="nm">{{ p.name }} <span class="sub">{{ p.검증 }}</span></span>
+          <span class="badge {{ 'b-in' if p.indoor == '실내' else 'b-out' }}">{{ p.category }} · {{ p.indoor }}</span>
+        </div>
+        <div class="sub">{{ p.area }}{% if p.baby_chair %} · {{ p.baby_chair }}아기의자{% endif %} · 주차: {{ p.parking.note }}</div>
+        {% if p.price.note %}<div class="sub">{{ p.price.note }}</div>{% endif %}
+        <a class="map" href="{{ p.kakao_url }}" target="_blank" rel="noopener">🗺 카카오맵</a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <footer>⚠️ 표시는 웹검색 기반으로 아직 직접 확인하지 않은 정보입니다. 다녀온 뒤 data/places.json 에서 ✅로 바꿔 주세요.</footer>
+</main>
+<script>
+  document.querySelectorAll('[data-day]').forEach(function (card) {
+    card.querySelectorAll('[data-pick]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        card.querySelectorAll('[data-pick]').forEach(function (b) { b.classList.toggle('on', b === btn); });
+        card.querySelectorAll('[data-opt]').forEach(function (o) { o.classList.toggle('hidden', o.dataset.opt !== btn.dataset.pick); });
+      });
+    });
+  });
+  document.querySelectorAll('#filters button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#filters button').forEach(function (b) { b.classList.toggle('on', b === btn); });
+      var f = btn.dataset.f;
+      document.querySelectorAll('.pitem').forEach(function (it) {
+        it.classList.toggle('hidden', f !== 'all' && it.dataset[f] !== '1');
+      });
+    });
+  });
+</script>
+</body>
+</html>

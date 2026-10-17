@@ -1,0 +1,60 @@
+# 매주 목요일 21:00(한국시간)에 이번 주 토·일 확정안을 만들어
+# 대시보드를 GitHub Pages에 올리고 슬랙으로 보낸다. 실패하면 슬랙으로 실패 알림.
+# 휴대폰 GitHub 앱/웹의 Actions 탭에서 "Run workflow" 버튼으로 수동 실행도 가능.
+name: 주말 확정안 (매주 목 21시)
+
+on:
+  schedule:
+    - cron: "0 12 * * 4"   # UTC 12:00 = 한국 21:00, 목요일
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: weekly-plan
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      TZ: Asia/Seoul
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+      OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: 계획 생성 + 대시보드
+        run: python src/planner.py --no-slack --no-open
+
+      - name: 대시보드만 공개 폴더로 복사
+        run: mkdir -p site && cp output/dashboard.html site/index.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: 슬랙 전송
+        run: python src/planner.py --send-only
+        env:
+          DASHBOARD_URL: ${{ steps.deploy.outputs.page_url }}
+
+      - name: 실패 알림
+        if: failure()
+        run: python src/notify_failure.py
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

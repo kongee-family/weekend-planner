@@ -1,0 +1,36 @@
+{
+  "origin": {
+    "name": "서울 양천구",
+    "lat": 37.517,
+    "lng": 126.866
+  },
+  "car": {
+    "fuel_efficiency_km_per_l": 12,
+    "fuel_type": "휘발유",
+    "fuel_price_won_per_l": 1700
+  },
+  "baby": {
+    "age_months": 24,
+    "sex": "남아",
+    "allergies": [],
+    "diet": "저염식"
+  },
+  "family": {
+    "adults": 2
+  },
+  "saturday": {
+    "type": "장거리 종일",
+    "depart": "08:30",
+    "return": "17:30",
+    "max_drive_min": 100
+  },
+  "sunday": {
+    "type": "근거리 반나절",
+    "depart": "09:30",
+    "return": "13:00",
+    "max_drive_min": 40
+  },
+  "slack_channel": "#주말-나들이",
+  "recent_visits": [],
+  "slack_channel_id": "C0CA47H6S68"
+}
